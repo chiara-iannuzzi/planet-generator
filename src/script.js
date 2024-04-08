@@ -202,13 +202,10 @@ atmosphereFolder.addColor(debugObject, 'atmosphereColor').onChange(() => {
 
 // Perlin
 
-const perlinTexture = textureLoader.load('/perlin.png')
-
 debugObject.ringColor = '#fde6cc'
 
 const ringUniforms = {
     uRingColor: new THREE.Uniform(new THREE.Color(debugObject.ringColor)),
-    uPerlinTexture: new THREE.Uniform(perlinTexture),
     uModValue: new THREE.Uniform(0.1)
 }
 const ringMaterial = new CustomShaderMaterial({
