@@ -17,8 +17,12 @@ npm run build
 
 ## Reste à faire : 
 
-[] atmosphère : opacité
-[] soleil : lumière, sa couleur, rotation, 
-[] Nuage (?)
-[] Ajouter anneau
-[] ajouter dossier sur gui
+[ ] atmosphère : opacité
+
+[ ] soleil : lumière, sa couleur, rotation, 
+
+[ ] Nuage (?)
+
+[ ] Ajouter anneau
+
+[ ] ajouter dossier sur gui
