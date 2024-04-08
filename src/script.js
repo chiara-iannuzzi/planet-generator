@@ -104,33 +104,32 @@ planet.castShadow = true
 scene.add(planet)
 
 // Tweaks
-gui.add(uniforms.uPositionFrequency, 'value', 0, 2, 0.001).name('uPositionFrequency')
-gui.add(uniforms.uStrength, 'value', 0, 2, 0.001).name('uStrength')
-gui.add(uniforms.uTimeFrequency, 'value', 0, 2, 0.001).name('uTimeFrequency')
-gui.add(uniforms.uWaterQuantity, 'value', 0, 0.1, 0.0001).name('uWaterQuantity')
+const terrainFolder = gui.addFolder('Terrain')
 
-gui.add(material, 'metalness', 0, 1, 0.001)
-gui.add(material, 'roughness', 0, 1, 0.001)
-gui.add(material, 'transmission', 0, 1, 0.001)
-gui.add(material, 'ior', 0, 10, 0.001)
-gui.add(material, 'thickness', 0, 10, 0.001)
+terrainFolder.add(uniforms.uPositionFrequency, 'value', 0, 2, 0.001).name('uPositionFrequency')
+terrainFolder.add(uniforms.uStrength, 'value', 0, 2, 0.001).name('uStrength')
+terrainFolder.add(uniforms.uTimeFrequency, 'value', 0, 2, 0.001).name('uTimeFrequency')
+terrainFolder.add(uniforms.uWaterQuantity, 'value', 0, 0.1, 0.0001).name('uWaterQuantity')
 
-gui.addColor(debugObject, 'colorWaterDeep').onChange(() => {
+terrainFolder.add(material, 'roughness', 0, 1, 0.001)
+terrainFolder.add(material, 'ior', 0, 10, 0.001)
+
+terrainFolder.addColor(debugObject, 'colorWaterDeep').onChange(() => {
     uniforms.uColorWaterDeep.value.set(debugObject.colorWaterDeep)
 })
-gui.addColor(debugObject, 'colorWaterSurface').onChange(() => {
+terrainFolder.addColor(debugObject, 'colorWaterSurface').onChange(() => {
     uniforms.uColorWaterSurface.value.set(debugObject.colorWaterSurface)
 })
-gui.addColor(debugObject, 'colorSand').onChange(() => {
+terrainFolder.addColor(debugObject, 'colorSand').onChange(() => {
     uniforms.uColorSand.value.set(debugObject.colorSand)
 })
-gui.addColor(debugObject, 'colorGrass').onChange(() => {
+terrainFolder.addColor(debugObject, 'colorGrass').onChange(() => {
     uniforms.uColorGrass.value.set(debugObject.colorGrass)
 })
-gui.addColor(debugObject, 'colorSnow').onChange(() => {
+terrainFolder.addColor(debugObject, 'colorSnow').onChange(() => {
     uniforms.uColorSnow.value.set(debugObject.colorSnow)
 })
-gui.addColor(debugObject, 'colorRock').onChange(() => {
+terrainFolder.addColor(debugObject, 'colorRock').onChange(() => {
     uniforms.uColorRock.value.set(debugObject.colorRock)
 })
 
@@ -155,9 +154,11 @@ scene.add(water)
  * Atmosphere
  */
 debugObject.atmosphereColor = '#bfbd8d'
+debugObject.atmosphereScale = 1.3
 
 const atmosphereUniforms = {
-    uAtmosphereColor: new THREE.Uniform(new THREE.Color('#ffffff'))
+    uAtmosphereColor: new THREE.Uniform(new THREE.Color('#ffffff')),
+    uAtmosphereOpacity: new THREE.Uniform(0.5)
 }
 const atmosphereMaterial = new CustomShaderMaterial({
     // CSM
@@ -176,15 +177,22 @@ const atmosphereMaterial = new CustomShaderMaterial({
     thickness: 1.5,
     transparent: true,
     wireframe: false,
-    side: THREE.BackSide
+    depthWrite: false,
+    side: THREE.BackSide,
 })
 
 const atmosphere = new THREE.Mesh(geometry, atmosphereMaterial)
-atmosphere.scale.set(1.3, 1.3, 1.3);
+atmosphere.scale.set(debugObject.atmosphereScale, debugObject.atmosphereScale, debugObject.atmosphereScale);
 scene.add(atmosphere)
 
 //Tweaks
-gui.addColor(debugObject, 'atmosphereColor').onChange(() => {
+const atmosphereFolder = gui.addFolder('Atmosphere')
+
+atmosphereFolder.add(atmosphereUniforms.uAtmosphereOpacity, 'value', 0, 1, 0.01)
+atmosphereFolder.add(debugObject, 'atmosphereScale', 1.1, 1.5, 0.001).onChange(() => {
+    atmosphere.scale.set(debugObject.atmosphereScale, debugObject.atmosphereScale, debugObject.atmosphereScale);
+})
+atmosphereFolder.addColor(debugObject, 'atmosphereColor').onChange(() => {
     atmosphereUniforms.uAtmosphereColor.value.set(debugObject.atmosphereColor)
 })
 
@@ -283,7 +291,7 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(35, sizes.width / sizes.height, 0.1, 100)
-camera.position.set(13, - 3, - 5)
+camera.position.set(13, 3, - 5)
 scene.add(camera)
 
 // Controls

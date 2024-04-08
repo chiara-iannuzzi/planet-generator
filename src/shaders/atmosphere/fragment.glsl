@@ -1,4 +1,5 @@
 uniform vec3 uAtmosphereColor;
+uniform float uAtmosphereOpacity;
 
 varying vec3 vViewDirection;
 varying vec3 vAtmosphereNormal;
@@ -12,7 +13,7 @@ void main()
     edgeAlpha = smoothstep(0.0, 0.8, edgeAlpha);
 
     // Final color
-    csm_FragColor = vec4(color, edgeAlpha);
+    csm_FragColor = vec4(color, edgeAlpha * uAtmosphereOpacity);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
 }
