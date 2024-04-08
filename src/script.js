@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js'
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import CustomShaderMaterial from 'three-custom-shader-material/vanilla'
 import GUI from 'lil-gui'
@@ -10,6 +9,9 @@ import planetFragmentShader from './shaders/planet/fragment.glsl'
 
 import atmosphereVertexShader from './shaders/atmosphere/vertex.glsl'
 import atmosphereFragmentShader from './shaders/atmosphere/fragment.glsl'
+
+import ringVertexShader from './shaders/ring/vertex.glsl'
+import ringFragmentShader from './shaders/ring/fragment.glsl'
 
 /**
  * Base
@@ -184,6 +186,52 @@ scene.add(atmosphere)
 //Tweaks
 gui.addColor(debugObject, 'atmosphereColor').onChange(() => {
     atmosphereUniforms.uAtmosphereColor.value.set(debugObject.atmosphereColor)
+})
+
+/**
+ * Ring
+ */
+
+// Perlin
+
+const perlinTexture = textureLoader.load('/perlin.png')
+
+debugObject.ringColor = '#fde6cc'
+
+const ringUniforms = {
+    uRingColor: new THREE.Uniform(new THREE.Color(debugObject.ringColor)),
+    uPerlinTexture: new THREE.Uniform(perlinTexture),
+    uModValue: new THREE.Uniform(0.1)
+}
+const ringMaterial = new CustomShaderMaterial({
+    // CSM
+    baseMaterial: THREE.MeshPhysicalMaterial,
+    uniforms: ringUniforms,
+    vertexShader: ringVertexShader,
+    fragmentShader: ringFragmentShader,
+    silent: true,
+
+    //MeshPhysical
+    metalness: 0,
+    roughness: 0.5,
+    color: '#ffffff',
+    wireframe: false,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide
+})
+
+const ringGeometry = new THREE.PlaneGeometry(10, 10, 10, 10);
+
+const ring = new THREE.Mesh(ringGeometry, ringMaterial)
+ring.rotation.x = Math.PI * 0.5
+scene.add(ring)
+
+const ringFolder = gui.addFolder('Ring')
+
+ringFolder.add(ringUniforms.uModValue, 'value', 0.005, 0.2, 0.001).name('uModValue')
+ringFolder.addColor(debugObject, 'ringColor').name('Color').onChange(() => {
+    ringUniforms.uRingColor.value.set(debugObject.ringColor)
 })
 
 /**
