@@ -106,13 +106,13 @@ scene.add(planet)
 // Tweaks
 const terrainFolder = gui.addFolder('Terrain')
 
-terrainFolder.add(uniforms.uPositionFrequency, 'value', 0, 2, 0.001).name('uPositionFrequency')
-terrainFolder.add(uniforms.uStrength, 'value', 0, 2, 0.001).name('uStrength')
+terrainFolder.add(uniforms.uPositionFrequency, 'value', 0, 2, 0.001).name('Frequency of mountains')
+terrainFolder.add(uniforms.uStrength, 'value', 0, 2, 0.001).name('Terrain strength')
 terrainFolder.add(uniforms.uTimeFrequency, 'value', 0, 2, 0.001).name('uTimeFrequency')
-terrainFolder.add(uniforms.uWaterQuantity, 'value', 0, 0.1, 0.0001).name('uWaterQuantity')
+terrainFolder.add(uniforms.uWaterQuantity, 'value', 0, 0.1, 0.0001).name('Quantity of water')
 
-terrainFolder.add(material, 'roughness', 0, 1, 0.001)
-terrainFolder.add(material, 'ior', 0, 10, 0.001)
+terrainFolder.add(material, 'roughness', 0, 1, 0.001).name('Terrain roughness')
+terrainFolder.add(material, 'ior', 0, 10, 0.001).name('Terrain IOR')
 
 terrainFolder.addColor(debugObject, 'colorWaterDeep').onChange(() => {
     uniforms.uColorWaterDeep.value.set(debugObject.colorWaterDeep)
@@ -188,11 +188,14 @@ scene.add(atmosphere)
 //Tweaks
 const atmosphereFolder = gui.addFolder('Atmosphere')
 
-atmosphereFolder.add(atmosphereUniforms.uAtmosphereOpacity, 'value', 0, 1, 0.01)
+atmosphereFolder.add(atmosphereUniforms.uAtmosphereOpacity, 'value', 0, 1, 0.01).name('Atmosphere Opacity')
 atmosphereFolder.add(debugObject, 'atmosphereScale', 1.1, 1.5, 0.001).onChange(() => {
     atmosphere.scale.set(debugObject.atmosphereScale, debugObject.atmosphereScale, debugObject.atmosphereScale);
 })
-atmosphereFolder.addColor(debugObject, 'atmosphereColor').onChange(() => {
+atmosphereFolder
+    .addColor(debugObject, 'atmosphereColor')
+    .name('Atmosphere Color')
+    .onChange(() => {
     atmosphereUniforms.uAtmosphereColor.value.set(debugObject.atmosphereColor)
 })
 
@@ -234,8 +237,8 @@ scene.add(ring)
 
 const ringFolder = gui.addFolder('Ring')
 
-ringFolder.add(ringUniforms.uModValue, 'value', 0.005, 0.2, 0.001).name('uModValue')
-ringFolder.addColor(debugObject, 'ringColor').name('Color').onChange(() => {
+ringFolder.add(ringUniforms.uModValue, 'value', 0.005, 0.2, 0.001).name('Variation in the ring')
+ringFolder.addColor(debugObject, 'ringColor').name('Color ring').onChange(() => {
     ringUniforms.uRingColor.value.set(debugObject.ringColor)
 })
 
