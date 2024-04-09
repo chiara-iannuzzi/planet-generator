@@ -14,5 +14,5 @@ void main(){
 
     distanceToCenter = smoothstep(0.0, 0.8, mod(length(vUv - vec2(0.5)), uModValue));
 
-    csm_FragColor = vec4(uRingColor, distanceToCenter * ( 10.0 / uModValue));
+    csm_DiffuseColor = vec4(uRingColor, distanceToCenter * ( 10.0 / uModValue));
 }

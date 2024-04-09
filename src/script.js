@@ -1,9 +1,10 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
-import { RGBELoader } from 'three/addons/loaders/RGBELoader.js'
 import { mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js'
 import CustomShaderMaterial from 'three-custom-shader-material/vanilla'
 import GUI from 'lil-gui'
+import { Lensflare, LensflareElement } from 'three/addons/objects/Lensflare.js';
+
 import planetVertexShader from './shaders/planet/vertex.glsl'
 import planetFragmentShader from './shaders/planet/fragment.glsl'
 
@@ -27,7 +28,15 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 // Loaders
-const rgbeLoader = new RGBELoader()
+const textureLoader = new THREE.TextureLoader()
+
+/**
+ * Light
+ */
+
+// Ambient
+const ambientLight = new THREE.AmbientLight('#ffffff', 0.2)
+scene.add(ambientLight)
 
 /**
  * Planet
@@ -235,6 +244,8 @@ const ringGeometry = new THREE.PlaneGeometry(10, 10, 10, 10);
 
 const ring = new THREE.Mesh(ringGeometry, ringMaterial)
 ring.rotation.x = Math.PI * 0.5
+ring.receiveShadow = true
+ring.castShadow = true
 scene.add(ring)
 
 const ringFolder = gui.addFolder('Ring')
@@ -252,21 +263,70 @@ ringFolder.addColor(debugObject, 'ringColor').name('Color ring').onChange(() => 
 /**
  * Sun
  */
-// const sun = new Mesh
+
+debugObject.sunColor = '#fece74'
+
+// Sun position
+const sunSpherical = new THREE.Spherical(15, Math.PI * 0.5, 0.0)
+sunSpherical.phi = 1.54
+const sunDirection = new THREE.Vector3()
+
+// Sun
+const light = new THREE.PointLight(debugObject.sunColor, 1.5, 2000, 0 );
+light.position.set( 15, 0, 5 );
+scene.add( light );
+
+// lensflares
+
+const textureFlare0 = textureLoader.load( '/lenses/lensflare0.png' );
+const textureFlare3 = textureLoader.load( '/lenses/lensflare1.png' );
+
+const lensflare = new Lensflare();
+lensflare.addElement( new LensflareElement( textureFlare0, 700, 0, light.color ) );
+lensflare.addElement( new LensflareElement( textureFlare3, 80, 0.6 ) );
+lensflare.addElement( new LensflareElement( textureFlare3, 120, 0.7 ) );
+lensflare.addElement( new LensflareElement( textureFlare3, 200, 0.9 ) );
+lensflare.addElement( new LensflareElement( textureFlare3, 70, 1 ) );
+light.add( lensflare );
+
+const updateSun = () => {
+    sunDirection.setFromSpherical(sunSpherical)
+    light.position.copy(sunDirection)
+}
+
+updateSun()
+
+//Tweaks
+
+gui.add(sunSpherical, 'phi')
+    .min(-5)
+    .max(5)
+    .step(0.01)
+    .onChange(updateSun)
+gui.add(sunSpherical, 'theta')
+    .min(-5)
+    .max(5)
+    .step(0.01)
+    .onChange(updateSun)
+gui.addColor(debugObject, 'sunColor').onChange(() => {
+    light.color.set(debugObject.sunColor)
+})
+
 
 /**
- * Lights
+ * Environment
  */
-const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
-directionalLight.castShadow = true
-directionalLight.shadow.mapSize.set(1024, 1024)
-directionalLight.shadow.camera.far = 15
-directionalLight.shadow.normalBias = 0.05
-directionalLight.position.set(0.25, 2, - 2.25)
-scene.add(directionalLight)
+const skyBoxGometry = new THREE.SphereGeometry(20, 248, 248);
+const textureSpace = textureLoader.load("/vanilla_bg.jpg");
+textureSpace.flipY = true;
+const skyBoxMaterial = new THREE.MeshBasicMaterial({
+  map: textureSpace,
+  side: THREE.BackSide
+});
 
-const ambientLight = new THREE.AmbientLight('#ffffff', 3)
-scene.add(ambientLight)
+const skyBox = new THREE.Mesh(skyBoxGometry, skyBoxMaterial);
+skyBox.userData = "no-occlusion";
+scene.add(skyBox);
 
 /**
  * Sizes
