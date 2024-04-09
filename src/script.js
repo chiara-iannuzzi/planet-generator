@@ -209,7 +209,9 @@ debugObject.ringColor = '#fde6cc'
 
 const ringUniforms = {
     uRingColor: new THREE.Uniform(new THREE.Color(debugObject.ringColor)),
-    uModValue: new THREE.Uniform(0.1)
+    uModValue: new THREE.Uniform(0.1),
+    uInternalRadius: new THREE.Uniform(0.3),
+    uExternalRadius: new THREE.Uniform(0.5)
 }
 const ringMaterial = new CustomShaderMaterial({
     // CSM
@@ -237,6 +239,11 @@ scene.add(ring)
 
 const ringFolder = gui.addFolder('Ring')
 
+ringFolder.add(ring, 'visible')
+ringFolder.add(ring.rotation, 'x', - Math.PI, Math.PI, 0.001).name('Rotation on x axis')
+ringFolder.add(ring.rotation, 'y', - Math.PI, Math.PI, 0.001).name('Rotation on y axis')
+ringFolder.add(ringUniforms.uInternalRadius, 'value', 0.2, 0.4 , 0.001).name('Internal Ring')
+ringFolder.add(ringUniforms.uExternalRadius, 'value', 0.4, 0.5, 0.001).name('External Ring')
 ringFolder.add(ringUniforms.uModValue, 'value', 0.005, 0.2, 0.001).name('Variation in the ring')
 ringFolder.addColor(debugObject, 'ringColor').name('Color ring').onChange(() => {
     ringUniforms.uRingColor.value.set(debugObject.ringColor)
